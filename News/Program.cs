@@ -8,6 +8,7 @@ using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.DependencyInjection;
 using News.Controllers.V1;
 using News.Data;
+using News.Domain;
 
 namespace News
 {
@@ -24,7 +25,7 @@ namespace News
                 await dbContext.Database.MigrateAsync();
 
                 var roleManager = serviceScope.ServiceProvider.GetRequiredService<RoleManager<IdentityRole>>();
-                var userManager = serviceScope.ServiceProvider.GetRequiredService<UserManager<IdentityUser>>();
+                var userManager = serviceScope.ServiceProvider.GetRequiredService<UserManager<User>>();
 
                 if (!await roleManager.RoleExistsAsync("Admin"))
                 {
@@ -42,10 +43,10 @@ namespace News
                 if (adminExists.Count <= 0)
                 {
                     var newUserId = Guid.NewGuid();
-                    var newUser = new IdentityUser
+                    var newUser = new User
                     {
                         Id = newUserId.ToString(),
-                        Email = "admin@example.com",
+                        Email = "-",
                         UserName = "admin"
                     };
                     await userManager.CreateAsync(newUser, "String1234.");

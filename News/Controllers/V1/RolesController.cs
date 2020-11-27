@@ -3,6 +3,7 @@ using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using News.Contracts.V1;
+using News.Contracts.V1.Requests;
 
 namespace News.Controllers.V1
 {
@@ -16,16 +17,22 @@ namespace News.Controllers.V1
         }
 
         [HttpGet(ApiRoutes.Roles.GetAll)]
-        public async Task<IActionResult> GetAll()
+        public IActionResult GetAll()
         {
             return Ok(_roleManager.Roles);
         }
         
         [HttpPost(ApiRoutes.Roles.Add)]
-        public async Task<IActionResult> Add([FromBody] string role)
+        public async Task<IActionResult> Add([FromBody] RoleRequest role)
         {
-            return Ok(await _roleManager.CreateAsync(new IdentityRole(role)));
+            return Ok(await _roleManager.CreateAsync(new IdentityRole(role.roleName)));
         }
 
+
+        [HttpDelete(ApiRoutes.Roles.Delete)]
+        public async Task<IActionResult> Delete([FromBody] RoleRequest role)
+        {
+            return Ok(await _roleManager.DeleteAsync(new IdentityRole(role.roleName)));
+        }
     }
 }

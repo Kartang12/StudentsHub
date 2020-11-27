@@ -1,57 +1,41 @@
 using System;
 using System.Collections.Generic;
-using System.IdentityModel.Tokens.Jwt;
 using System.Linq;
-using System.Security.Claims;
-using System.Text;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Identity;
-using Microsoft.EntityFrameworkCore;
-using Microsoft.IdentityModel.Tokens;
+using News.Contracts.V1.Responses;
 using News.Data;
 using News.Domain;
-using News.Options;
 
 namespace News.Services
 {
-    public class IdentityService
+    public class IdentityService : IIdentityService
     {
         private readonly RoleManager<IdentityRole> _roleManager;
         private readonly UserManager<User> _userManager;
-        private readonly JwtSettings _jwtSettings;
-        private readonly TokenValidationParameters _tokenValidationParameters;
         private readonly DataContext _context;
-        private readonly ExcersiseService _excersiseService;
-        private readonly SubjectService _subjectService;
-        private readonly GroupService _groupService;
+        private readonly IGroupService _groupService;
 
-        public IdentityService(UserManager<User> userManager, JwtSettings jwtSettings, TokenValidationParameters tokenValidationParameters, DataContext context, RoleManager<IdentityRole> roleManager, GroupService groupService, SubjectService subjectService, ExcersiseService excersiseService)
+        public IdentityService(UserManager<User> userManager, DataContext context, RoleManager<IdentityRole> roleManager, IGroupService groupService)
         {
             _userManager = userManager;
-            _jwtSettings = jwtSettings;
-            _tokenValidationParameters = tokenValidationParameters;
-            _context = context;
             _roleManager = roleManager;
+            _context = context;
             _groupService = groupService;
-            _subjectService = subjectService;
-            _excersiseService = excersiseService;
         }
 
-        public async Task<AuthenticationResult> RegisterAsync(string email, string name, string password, string role, string group, List<string> subjects)
+        public async Task<AuthSuccessResponse> RegisterAsync(string email, string name, string password, string role, string group, List<Subject> subjects)
         {
             var existingUser = await _userManager.FindByEmailAsync(email);
 
             if (existingUser != null)
             {
-                return new AuthenticationResult
+                return new AuthSuccessResponse
                 {
+                    Success = false,
                     Errors = new[] { "email занят" }
                 };
             }
-            List<Subject> newSubjects = new List<Subject>();
-            if (subjects.Count() > 0)
-                foreach (string subject in subjects)
-                    newSubjects.Add((await _subjectService.GetSubjectsAsync()).FirstOrDefault(x => x.Name == subject));
 
             var newUserId = Guid.NewGuid();
             var newUser = new User
@@ -59,41 +43,54 @@ namespace News.Services
                 Id = newUserId.ToString(),
                 Email = email,
                 UserName = name,
-                group = await _groupService.GetGroupAsync(group),
-                subjects = newSubjects
+                subjects = subjects,
+                group = null
             };
+
+            if (group != null)
+                newUser.group = await _groupService.GetGroupAsync(group);
+
+            if (!_roleManager.Roles.Select(x => x.Name == role).Any())
+                return new AuthSuccessResponse
+                {
+                    Success = false,
+                    Errors = new[] { "Такой роли не существует" }
+                };
 
             var createdUser = await _userManager.CreateAsync(newUser, password);
 
             if (!createdUser.Succeeded)
             {
-                return new AuthenticationResult
+                return new AuthSuccessResponse
                 {
+                    Success = false,
                     Errors = createdUser.Errors.Select(x => x.Description)
                 };
             }
 
-            if (!_roleManager.Roles.Select(x => x.Name == role).Any())
-                return new AuthenticationResult
-                {
-                    Errors = new[] { "Такой роли не существует" }
-                };
-
             await _userManager.AddToRoleAsync(newUser, role);
-
             await _context.SaveChangesAsync();
 
-            return new AuthenticationResult();
+            return new AuthSuccessResponse()
+            {
+                Id = newUser.Id,
+                Email = newUser.Email,
+                Name = newUser.UserName,
+                Group = group,
+                subjects = subjects,
+                Success = true
+            };
         }
 
-        public async Task<AuthenticationResult> LoginAsync(string email, string password)
+        public async Task<AuthSuccessResponse> LoginAsync(string email, string password)
         {
             var user = await _userManager.FindByEmailAsync(email);
 
             if (user == null)
             {
-                return new AuthenticationResult
+                return new AuthSuccessResponse
                 {
+                    Success = false,
                     Errors = new[] { "User does not exist" }
                 };
             }
@@ -102,20 +99,32 @@ namespace News.Services
 
             if (!userHasValidPassword)
             {
-                return new AuthenticationResult
+                return new AuthSuccessResponse
                 {
+                    Success = false,
                     Errors = new[] { "User/password combination is wrong" }
                 };
             }
 
-            return await GenerateAuthenticationResultForUserAsync(user);
+            var userRoles = await _userManager.GetRolesAsync(user);
+
+            return new AuthSuccessResponse
+            {
+                Id = user.Id,
+                Email = user.Email,
+                Name = user.UserName ??= null,
+                Group = (user.group != null) ? user.group.Id : null,
+                subjects = (user.subjects != null) ? user.subjects : null,
+                Roles = (userRoles != null) ? userRoles.ToList() : null,
+                Success = true
+        };
         }
 
-        public async Task<IdentityUser> GetUsersByName(string name)
+        public async Task<User> GetUsersByName(string name)
         {
             return await _userManager.FindByNameAsync(name);
         }
-        public async Task<IdentityUser> GetUserByEmail(string name)
+        public async Task<User> GetUserByEmail(string name)
         {
             return await _userManager.FindByEmailAsync(name);
         }
@@ -204,72 +213,73 @@ namespace News.Services
         //               StringComparison.InvariantCultureIgnoreCase);
         //}
 
-        private async Task<AuthenticationResult> GenerateAuthenticationResultForUserAsync(User user)
+        //private async Task<AuthSuccessResponse> GenerateAuthenticationResultForUserAsync(User user)
+        //{
+        //    #region
+        //    //var tokenHandler = new JwtSecurityTokenHandler();
+        //    //var key = Encoding.ASCII.GetBytes(_jwtSettings.Secret);
+
+        //    //var claims = new List<Claim>
+        //    //{
+        //    //    new Claim(JwtRegisteredClaimNames.Sub, user.UserName),
+        //    //    new Claim(JwtRegisteredClaimNames.Jti, Guid.NewGuid().ToString()),
+        //    //    new Claim(JwtRegisteredClaimNames.Email, user.UserName),
+        //    //    new Claim("id", user.Id)
+        //    //};
+
+        //    //var userClaims = await _userManager.GetClaimsAsync(user);
+        //    //claims.AddRange(userClaims);
+        //    #endregion
+        //    var userRoles = await _userManager.GetRolesAsync(user);
+        //    #region
+        //    //foreach (var userRole in userRoles)
+        //    //{
+        //    //    claims.Add(new Claim(ClaimTypes.Role, userRole));
+        //    //    var role = await _roleManager.FindByNameAsync(userRole);
+        //    //    if (role == null) continue;
+        //    //    var roleClaims = await _roleManager.GetClaimsAsync(role);
+
+        //    //    foreach (var roleClaim in roleClaims)
+        //    //    {
+        //    //        if (claims.Contains(roleClaim))
+        //    //            continue;
+
+        //    //        claims.Add(roleClaim);
+        //    //    }
+        //    //}
+
+        //    //var tokenDescriptor = new SecurityTokenDescriptor
+        //    //{
+        //    //    Subject = new ClaimsIdentity(claims),
+        //    //    Expires = DateTime.UtcNow.Add(_jwtSettings.TokenLifetime),
+        //    //    SigningCredentials =
+        //    //        new SigningCredentials(new SymmetricSecurityKey(key), SecurityAlgorithms.HmacSha256Signature)
+        //    //};
+
+        //    //var token = tokenHandler.CreateToken(tokenDescriptor);
+
+        //    //await _context.SaveChangesAsync();
+        //    //var roles = await _userManager.GetRolesAsync(user);
+        //    //string business = null;
+        //    //try
+        //    //{
+        //    //    var userBusiness = await _identityService.Ge.(user.Id);
+        //    //    business = userBusiness.Name;
+        //    //}
+        //    //catch (Exception ex) { Console.WriteLine("User doesn't have business"); }
+        //    #endregion
+        //    return new AuthSuccessResponse
+        //    {
+        //        Id = user.Id,
+        //        Email = user.Email,
+        //        Roles = userRoles.ToList<string>(),
+        //        subjects = user.subjects
+        //    };
+        //}
+
+        public async Task<IdentityResult> DeleteUser(string email)
         {
-            var tokenHandler = new JwtSecurityTokenHandler();
-            var key = Encoding.ASCII.GetBytes(_jwtSettings.Secret);
-
-            var claims = new List<Claim>
-            {
-                new Claim(JwtRegisteredClaimNames.Sub, user.UserName),
-                new Claim(JwtRegisteredClaimNames.Jti, Guid.NewGuid().ToString()),
-                new Claim(JwtRegisteredClaimNames.Email, user.UserName),
-                new Claim("id", user.Id)
-            };
-
-            var userClaims = await _userManager.GetClaimsAsync(user);
-            claims.AddRange(userClaims);
-
-            var userRoles = await _userManager.GetRolesAsync(user);
-            foreach (var userRole in userRoles)
-            {
-                claims.Add(new Claim(ClaimTypes.Role, userRole));
-                var role = await _roleManager.FindByNameAsync(userRole);
-                if (role == null) continue;
-                var roleClaims = await _roleManager.GetClaimsAsync(role);
-
-                foreach (var roleClaim in roleClaims)
-                {
-                    if (claims.Contains(roleClaim))
-                        continue;
-
-                    claims.Add(roleClaim);
-                }
-            }
-
-            var tokenDescriptor = new SecurityTokenDescriptor
-            {
-                Subject = new ClaimsIdentity(claims),
-                Expires = DateTime.UtcNow.Add(_jwtSettings.TokenLifetime),
-                SigningCredentials =
-                    new SigningCredentials(new SymmetricSecurityKey(key), SecurityAlgorithms.HmacSha256Signature)
-            };
-
-            var token = tokenHandler.CreateToken(tokenDescriptor);
-
-            await _context.SaveChangesAsync();
-            var roles = await _userManager.GetRolesAsync(user);
-            string business = null;
-            try
-            {
-                var userBusiness = await _businessService.GetBusinessOfUser(user.Id);
-                business = userBusiness.Name;
-            }
-            catch (Exception ex) { Console.WriteLine("User doesn't have business"); }
-
-            return new AuthenticationResult
-            {
-                Success = true,
-                Token = tokenHandler.WriteToken(token),
-                RefreshToken = refreshToken.Token,
-                Role = roles.Count > 0 ? roles.First() : null,
-                BusinessType = business
-            };
-        }
-
-        public async Task<IdentityResult> DeleteUser(string name)
-        {
-            var user = await _userManager.FindByNameAsync(name);
+            var user = await _userManager.FindByEmailAsync(email);
             try
             {
                 if ((await _userManager.GetRolesAsync(user)).First().ToLower() == "admin")

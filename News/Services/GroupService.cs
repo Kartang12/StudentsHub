@@ -8,7 +8,7 @@ using System.Threading.Tasks;
 
 namespace News.Services
 {
-    public class GroupService
+    public class GroupService : IGroupService
     {
         private readonly DataContext _dataContext;
 

@@ -5,7 +5,7 @@ namespace News.Domain
 {
     public class User : IdentityUser
     {
-        public virtual Group group { get; set; }
-        public virtual List<Subject> subjects { get; set; }
+        public Group group { get; set; }
+        public List<Subject> subjects { get; set; }
     }
 }

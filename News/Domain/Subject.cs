@@ -6,6 +6,8 @@ namespace News.Domain
 {
     public class Subject
     {
+        [DatabaseGenerated(DatabaseGeneratedOption.Identity)]
+        [Key]
         public Guid Id { get; set; }
 
         public string Name { get; set; }
