@@ -11,7 +11,7 @@ namespace News.Services
 {
     public interface IIdentityService
     {
-        Task<AuthSuccessResponse> RegisterAsync(string email, string name, string password, string role, string group, List<Subject> subjects);
+        Task<AuthSuccessResponse> RegisterAsync(string email, string name, string password, string role, string group, List<string> subjects);
 
         Task<AuthSuccessResponse> LoginAsync(string email, string password);
 

@@ -10,8 +10,8 @@ using News.Data;
 namespace News.Migrations
 {
     [DbContext(typeof(DataContext))]
-    [Migration("20201127114507_groupBug")]
-    partial class groupBug
+    [Migration("20201127135704_subjectsBug")]
+    partial class subjectsBug
     {
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
@@ -183,8 +183,12 @@ namespace News.Migrations
 
             modelBuilder.Entity("News.Domain.Group", b =>
                 {
-                    b.Property<string>("Id")
-                        .HasColumnType("nvarchar(450)");
+                    b.Property<Guid>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("uniqueidentifier");
+
+                    b.Property<string>("Name")
+                        .HasColumnType("nvarchar(max)");
 
                     b.HasKey("Id");
 
@@ -283,8 +287,8 @@ namespace News.Migrations
                         .HasMaxLength(256)
                         .HasColumnType("nvarchar(256)");
 
-                    b.Property<string>("groupId")
-                        .HasColumnType("nvarchar(450)");
+                    b.Property<Guid?>("groupId")
+                        .HasColumnType("uniqueidentifier");
 
                     b.HasKey("Id");
 

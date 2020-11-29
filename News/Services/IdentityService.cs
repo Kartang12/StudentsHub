@@ -24,7 +24,7 @@ namespace News.Services
             _groupService = groupService;
         }
 
-        public async Task<AuthSuccessResponse> RegisterAsync(string email, string name, string password, string role, string group, List<Subject> subjects)
+        public async Task<AuthSuccessResponse> RegisterAsync(string email, string name, string password, string role, string group, List<string> subjects)
         {
             var existingUser = await _userManager.FindByEmailAsync(email);
 
@@ -42,13 +42,11 @@ namespace News.Services
             {
                 Id = newUserId.ToString(),
                 Email = email,
-                UserName = name,
-                subjects = subjects,
-                group = null
+                UserName = name
             };
 
-            if (group != null)
-                newUser.group = await _groupService.GetGroupAsync(group);
+            var createdUser = await _userManager.CreateAsync(newUser, password);
+            await _context.SaveChangesAsync();
 
             if (!_roleManager.Roles.Select(x => x.Name == role).Any())
                 return new AuthSuccessResponse
@@ -57,7 +55,18 @@ namespace News.Services
                     Errors = new[] { "Такой роли не существует" }
                 };
 
-            var createdUser = await _userManager.CreateAsync(newUser, password);
+            newUser = await _userManager.FindByEmailAsync(email);
+            newUser.subjects = new List<Subject>();
+            foreach(string sub in subjects)
+            {
+                newUser.subjects.Add(_context.Subjects.FirstOrDefault(x => x.Name == sub));
+            }
+            
+            if (group != null)
+                newUser.group = await _groupService.GetGroupAsync(group);
+
+
+
 
             if (!createdUser.Succeeded)
             {
@@ -77,7 +86,7 @@ namespace News.Services
                 Email = newUser.Email,
                 Name = newUser.UserName,
                 Group = group,
-                subjects = subjects,
+                subjects = newUser.subjects,
                 Success = true
             };
         }
@@ -113,7 +122,7 @@ namespace News.Services
                 Id = user.Id,
                 Email = user.Email,
                 Name = user.UserName ??= null,
-                Group = (user.group != null) ? user.group.Id : null,
+                Group = (user.group != null) ? user.group.Name : null,
                 subjects = (user.subjects != null) ? user.subjects : null,
                 Roles = (userRoles != null) ? userRoles.ToList() : null,
                 Success = true

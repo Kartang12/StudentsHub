@@ -22,14 +22,14 @@ namespace News.Services
             return await _dataContext.Excersises.Include(x=> x.subject).AsNoTracking().ToListAsync();
         }
 
-        public async Task<Excersise> GetExcersesByIdAsync(string id)
+        public async Task<Excersise> GetExcerseByIdAsync(string id)
         {
             return await _dataContext.Excersises.Include(x => x.subject).AsNoTracking().SingleOrDefaultAsync(x => x.Id.ToString() == id);
         }
 
-        public async Task<List<Excersise>> GetExcersesBySubjectAsync(string subjectId)
+        public async Task<List<Excersise>> GetExcersesBySubjectAsync(string subjectName)
         {
-            return await _dataContext.Excersises.AsNoTracking().Where(x => x.subject.Id == Guid.Parse(subjectId)).Include(x => x.subject).ToListAsync();
+            return await _dataContext.Excersises.AsNoTracking().Where(x => x.subject.Name == subjectName).Include(x => x.subject).ToListAsync();
         }
         
         public async Task<bool> DeleteExcesiseAsync(string id)
@@ -40,16 +40,20 @@ namespace News.Services
             return removed > 0;
         }
 
-        public async Task<bool> CreateExcersiseAsync(string title, string content, string correctAnswer, Subject subject)
+        public async Task<bool> CreateExcersiseAsync(string title, string content, string correctAnswer, string subjectName)
         {
-
+            var id = Guid.NewGuid();
             await _dataContext.Excersises.AddAsync(new Excersise
             {
+                Id = id,
                 title = title,
                 content = content,
                 correctAnswer = correctAnswer,
-                subject = _dataContext.Subjects.SingleOrDefault(x => x.Name == subject.Name)
             });
+            await _dataContext.SaveChangesAsync();
+
+            var temp = _dataContext.Excersises.First(x => x.Id == id);
+            temp.subject = _dataContext.Subjects.SingleOrDefault(x => x.Name == subjectName);
             var created = await _dataContext.SaveChangesAsync();
             return created > 0;
         }

@@ -23,11 +23,17 @@ namespace News.Controllers.V1
         {
             return Ok(await _excersiseService.GetAll());
         }
+        
+        [HttpGet(ApiRoutes.Excersises.GetById)]
+        public async Task<IActionResult> GetAll([FromRoute] string id)
+        {
+            return Ok(await _excersiseService.GetExcerseByIdAsync(id));
+        }
 
         [HttpGet(ApiRoutes.Excersises.Get)]
-        public async Task<IActionResult> GetBySubject([FromRoute] string subjectId)
+        public async Task<IActionResult> GetBySubject([FromRoute] string subjectName)
         {
-            var ex = await _excersiseService.GetExcersesBySubjectAsync(subjectId);
+            var ex = await _excersiseService.GetExcersesBySubjectAsync(subjectName);
 
             if (ex == null)
             {
@@ -40,7 +46,7 @@ namespace News.Controllers.V1
         [HttpPost(ApiRoutes.Excersises.Create)]
         public async Task<IActionResult> Create([FromBody] CreateExcersiseRequest request)
         {
-            var created = await _excersiseService.CreateExcersiseAsync(request.Title, request.Content, request.CorrectAnswer, request.subject);
+            var created = await _excersiseService.CreateExcersiseAsync(request.Title, request.Content, request.CorrectAnswer, request.SubjectName);
             if (!created)
             {
                 return BadRequest(new { error = "Unable to create excersise" });

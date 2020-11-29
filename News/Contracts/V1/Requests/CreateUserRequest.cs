@@ -17,6 +17,6 @@ namespace News.Contracts.V1.Requests
 
         public string Group { get; set; }
 
-        public virtual List<Subject> subjects { get; set; }
+        public virtual List<string> subjects { get; set; }
     }
 }

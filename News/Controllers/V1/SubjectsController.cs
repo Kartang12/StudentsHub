@@ -22,7 +22,7 @@ namespace News.Controllers.V1
             return Ok(await _subjectService.GetSubjectsAsync());
         }
 
-        [HttpGet(ApiRoutes.Subjects.GetByUser)]
+        [HttpGet(ApiRoutes.Subjects.Get)]
         public async Task<IActionResult> Get([FromRoute] string subName)
         {
             var subject = await _subjectService.GetAsync(subName);
@@ -35,10 +35,10 @@ namespace News.Controllers.V1
             return Ok(subject);
         }
         
-        [HttpGet(ApiRoutes.Subjects.Get)]
-        public async Task<IActionResult> GetSubjectsByUserId([FromRoute] string userName)
+        [HttpGet(ApiRoutes.Subjects.GetByUser)]
+        public async Task<IActionResult> GetSubjectsByUserId([FromRoute] string userId)
         {
-            var subject = await _subjectService.GetSubjectsByUserIdAsync(userName);
+            var subject = await _subjectService.GetSubjectsByUserIdAsync(userId);
 
             if (subject == null)
             {return NotFound();}

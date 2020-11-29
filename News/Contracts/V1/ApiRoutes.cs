@@ -42,7 +42,7 @@
         {
             public const string GetAll = Base + "/subjects";
             public const string Get = Base + "/subjects/{subName}";
-            public const string GetByUser = Base + "/subjectsByUser/{subName}";
+            public const string GetByUser = Base + "/subjectsByUserId/{userId}";
             public const string Create = Base + "/subjects";
             public const string Delete = Base + "/subjects/{subName}";
             public const string Update = Base + "/subjects/{subName}";
@@ -50,10 +50,11 @@
 
         public static class Excersises
         {
-            public const string GetAll = Base + "/excesises";
-            public const string Get = Base + "/excesises/{subjectId}";
-            public const string Create = Base + "/excesises";
-            public const string Delete = Base + "/excesises/{id}";
+            public const string GetAll = Base + "/excersises";
+            public const string GetById = Base + "/excersise/{id}";
+            public const string Get = Base + "/excersises/{subjectName}";
+            public const string Create = Base + "/excersises";
+            public const string Delete = Base + "/excersises/{id}";
         }
     }
 }
