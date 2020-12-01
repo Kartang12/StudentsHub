@@ -41,7 +41,7 @@ namespace News.Controllers.V1
             var subject = await _subjectService.GetSubjectsByUserIdAsync(userId);
 
             if (subject == null)
-            {return NotFound();}
+                {return NotFound();}
 
             return Ok(subject);
         }

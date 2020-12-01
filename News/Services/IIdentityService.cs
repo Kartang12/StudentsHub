@@ -19,6 +19,6 @@ namespace News.Services
 
         Task<User> GetUserByEmail(string name);
 
-        Task<IdentityResult> DeleteUser(string name);
+        Task<IdentityResult> DeleteUser(string id);
     }
 }

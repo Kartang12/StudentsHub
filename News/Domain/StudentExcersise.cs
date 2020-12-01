@@ -8,8 +8,8 @@ namespace News.Domain
 {
     public class StudentExcersise
     {
-        public Excersise task { get; set; }
-        public User user { get; set; }
+        public string taskId { get; set; }
+        public string userId { get; set; }
         public string answer { get; set; }
         public int mark { get; set; }
     }

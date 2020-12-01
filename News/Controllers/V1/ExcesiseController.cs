@@ -43,6 +43,19 @@ namespace News.Controllers.V1
             return Ok(ex);
         }
 
+        [HttpPost(ApiRoutes.Excersises.Save)]
+        public async Task<IActionResult> SaveExcersiseAsync([FromBody] ExcersiseAnswerRequest request)
+        {
+            var ex = await _excersiseService.SaveExcersiseAsync(request.userId, request.taskId, request.answer);
+
+            if (ex == false)
+            {
+                return NotFound();
+            }
+
+            return Ok(ex);
+        }
+
         [HttpPost(ApiRoutes.Excersises.Create)]
         public async Task<IActionResult> Create([FromBody] CreateExcersiseRequest request)
         {
@@ -62,6 +75,28 @@ namespace News.Controllers.V1
 
             if (deleted)
                 return NoContent();
+
+            return NotFound();
+        }
+
+        [HttpPut(ApiRoutes.Excersises.Update)]
+        public async Task<IActionResult> Update([FromRoute] string id, [FromBody] ExersiseUpdateRequest ex)
+        {
+            var updated = await _excersiseService.UpdateExcersiseAsync(id, ex.title, ex.content, ex.correctAnswer);
+
+            if (updated)
+                return Ok();
+
+            return NotFound();
+        }
+
+        [HttpGet(ApiRoutes.Excersises.GetMarks)]
+        public async Task<IActionResult> GetMarks([FromRoute] string id)
+        {
+            var marks = await _excersiseService.GetMarksAsync(id);
+
+            if (marks!=null)
+                return Ok(marks);
 
             return NotFound();
         }

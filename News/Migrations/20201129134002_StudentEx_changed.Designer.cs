@@ -3,15 +3,17 @@ using System;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using News.Data;
 
 namespace News.Migrations
 {
     [DbContext(typeof(DataContext))]
-    partial class DataContextModelSnapshot : ModelSnapshot
+    [Migration("20201129134002_StudentEx_changed")]
+    partial class StudentEx_changed
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -221,7 +223,12 @@ namespace News.Migrations
                     b.Property<string>("Name")
                         .HasColumnType("nvarchar(max)");
 
+                    b.Property<string>("UserId")
+                        .HasColumnType("nvarchar(450)");
+
                     b.HasKey("Id");
+
+                    b.HasIndex("UserId");
 
                     b.ToTable("Subjects");
                 });
@@ -296,21 +303,6 @@ namespace News.Migrations
                     b.ToTable("AspNetUsers");
                 });
 
-            modelBuilder.Entity("SubjectUser", b =>
-                {
-                    b.Property<Guid>("subjectsId")
-                        .HasColumnType("uniqueidentifier");
-
-                    b.Property<string>("usersId")
-                        .HasColumnType("nvarchar(450)");
-
-                    b.HasKey("subjectsId", "usersId");
-
-                    b.HasIndex("usersId");
-
-                    b.ToTable("SubjectUser");
-                });
-
             modelBuilder.Entity("Microsoft.AspNetCore.Identity.IdentityRoleClaim<string>", b =>
                 {
                     b.HasOne("Microsoft.AspNetCore.Identity.IdentityRole", null)
@@ -371,28 +363,30 @@ namespace News.Migrations
                     b.Navigation("subject");
                 });
 
+            modelBuilder.Entity("News.Domain.Subject", b =>
+                {
+                    b.HasOne("News.Domain.User", null)
+                        .WithMany("subjects")
+                        .HasForeignKey("UserId");
+                });
+
             modelBuilder.Entity("News.Domain.User", b =>
                 {
                     b.HasOne("News.Domain.Group", "group")
-                        .WithMany()
+                        .WithMany("users")
                         .HasForeignKey("groupId");
 
                     b.Navigation("group");
                 });
 
-            modelBuilder.Entity("SubjectUser", b =>
+            modelBuilder.Entity("News.Domain.Group", b =>
                 {
-                    b.HasOne("News.Domain.Subject", null)
-                        .WithMany()
-                        .HasForeignKey("subjectsId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
+                    b.Navigation("users");
+                });
 
-                    b.HasOne("News.Domain.User", null)
-                        .WithMany()
-                        .HasForeignKey("usersId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
+            modelBuilder.Entity("News.Domain.User", b =>
+                {
+                    b.Navigation("subjects");
                 });
 #pragma warning restore 612, 618
         }

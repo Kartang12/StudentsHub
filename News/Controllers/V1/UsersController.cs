@@ -41,6 +41,7 @@ namespace News.Controllers.V1
                 }
                 response.Add(new UserDataResponse()
                 {
+                    Id = user.Id,
                     Name = user.UserName,
                     Role = role
                 });
@@ -81,9 +82,9 @@ namespace News.Controllers.V1
         //}
 
         [HttpDelete(ApiRoutes.Users.Delete)]
-        public async Task<IActionResult> Delete([FromRoute] string email)
+        public async Task<IActionResult> Delete([FromRoute] string id)
         {
-            var result = await _identityService.DeleteUser(email);
+            var result = await _identityService.DeleteUser(id);
 
             if (result.Succeeded)
                 return Ok();

@@ -24,7 +24,7 @@ namespace News.Services
 
         public async Task<Group> GetGroupAsync(string groupName)
         {
-            return await _dataContext.Groups.AsNoTracking().SingleOrDefaultAsync(x => x.Name == groupName.ToLower());
+            return await _dataContext.Groups.AsNoTracking().SingleOrDefaultAsync(x => x.Name.ToLower() == groupName.ToLower());
         }
 
         public async Task<bool> CreateGroupAsync(string groupName)

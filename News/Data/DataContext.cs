@@ -23,7 +23,8 @@ namespace News.Data
         protected override void OnModelCreating(ModelBuilder builder)
         {
             base.OnModelCreating(builder);
-            builder.Entity<StudentExcersise>().HasNoKey();
+            builder.Entity<StudentExcersise>().HasKey(x => new { x.userId, x.taskId});
+            builder.Entity<Subject>().HasKey(x => new { x.Id});
             //builder.Entity<Tag>().HasKey(x => new {x.TagId, x.TagName});
             //builder.Entity<UserBusiness>().HasNoKey();
         }

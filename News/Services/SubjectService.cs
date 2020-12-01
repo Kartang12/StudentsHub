@@ -29,7 +29,8 @@ namespace News.Services
 
         public Task<List<Subject>> GetSubjectsByUserIdAsync(string uId)
         {
-            return Task.FromResult( _dataContext.Users.Include(x => x.subjects).FirstOrDefault(x => x.Id == uId).subjects);
+            var user = _dataContext.Users.Include(x => x.subjects).FirstOrDefault(x => x.Id == uId);
+            return Task.FromResult( user.subjects);
         }
 
         public async Task<bool> CreateSubjectAsync(string subjectName)

@@ -15,6 +15,10 @@ namespace News.Services
         Task<bool> CreateExcersiseAsync(string title, string content, string correctAnswer, string subjectName);
         //Task<bool> CreateExcersiseAsync(string title, string content, string correctAnswer, string subjectName);
         Task<bool> DeleteExcesiseAsync(string id);
-        Task<Excersise> UpdateExcersiseAsync(string excesiseId, string title, string content, string correctAnswer);
+        Task<bool> UpdateExcersiseAsync(string excesiseId, string title, string content, string correctAnswer);
+
+        Task<bool> SaveExcersiseAsync(string userId, string taskId, string answer);
+
+        Task<StudentExcersise[]> GetMarksAsync(string userId);
     }
 }

@@ -11,7 +11,5 @@ namespace News.Domain
         public Guid Id { get; set; }
 
         public string Name { get; set; }
-
-        public List<User> users { get; set; } = new List<User>();
     }
 }

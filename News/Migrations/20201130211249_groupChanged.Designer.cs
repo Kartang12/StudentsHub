@@ -10,8 +10,8 @@ using News.Data;
 namespace News.Migrations
 {
     [DbContext(typeof(DataContext))]
-    [Migration("20201127135704_subjectsBug")]
-    partial class subjectsBug
+    [Migration("20201130211249_groupChanged")]
+    partial class groupChanged
     {
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
@@ -197,21 +197,19 @@ namespace News.Migrations
 
             modelBuilder.Entity("News.Domain.StudentExcersise", b =>
                 {
+                    b.Property<string>("userId")
+                        .HasColumnType("nvarchar(450)");
+
+                    b.Property<string>("taskId")
+                        .HasColumnType("nvarchar(450)");
+
                     b.Property<string>("answer")
                         .HasColumnType("nvarchar(max)");
 
                     b.Property<int>("mark")
                         .HasColumnType("int");
 
-                    b.Property<Guid?>("taskId")
-                        .HasColumnType("uniqueidentifier");
-
-                    b.Property<string>("userId")
-                        .HasColumnType("nvarchar(450)");
-
-                    b.HasIndex("taskId");
-
-                    b.HasIndex("userId");
+                    b.HasKey("userId", "taskId");
 
                     b.ToTable("StudentExcersises");
                 });
@@ -365,21 +363,6 @@ namespace News.Migrations
                     b.Navigation("subject");
                 });
 
-            modelBuilder.Entity("News.Domain.StudentExcersise", b =>
-                {
-                    b.HasOne("News.Domain.Excersise", "task")
-                        .WithMany()
-                        .HasForeignKey("taskId");
-
-                    b.HasOne("News.Domain.User", "user")
-                        .WithMany()
-                        .HasForeignKey("userId");
-
-                    b.Navigation("task");
-
-                    b.Navigation("user");
-                });
-
             modelBuilder.Entity("News.Domain.Subject", b =>
                 {
                     b.HasOne("News.Domain.User", null)
@@ -390,15 +373,10 @@ namespace News.Migrations
             modelBuilder.Entity("News.Domain.User", b =>
                 {
                     b.HasOne("News.Domain.Group", "group")
-                        .WithMany("users")
+                        .WithMany()
                         .HasForeignKey("groupId");
 
                     b.Navigation("group");
-                });
-
-            modelBuilder.Entity("News.Domain.Group", b =>
-                {
-                    b.Navigation("users");
                 });
 
             modelBuilder.Entity("News.Domain.User", b =>

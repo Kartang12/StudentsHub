@@ -48,7 +48,7 @@ namespace News.Services
             var createdUser = await _userManager.CreateAsync(newUser, password);
             await _context.SaveChangesAsync();
 
-            if (!_roleManager.Roles.Select(x => x.Name == role).Any())
+            if (!_roleManager.Roles.Select(x => x.Name.ToLower() == role.ToLower()).Any())
                 return new AuthSuccessResponse
                 {
                     Success = false,
@@ -64,9 +64,6 @@ namespace News.Services
             
             if (group != null)
                 newUser.group = await _groupService.GetGroupAsync(group);
-
-
-
 
             if (!createdUser.Succeeded)
             {
@@ -86,7 +83,6 @@ namespace News.Services
                 Email = newUser.Email,
                 Name = newUser.UserName,
                 Group = group,
-                subjects = newUser.subjects,
                 Success = true
             };
         }
@@ -286,9 +282,9 @@ namespace News.Services
         //    };
         //}
 
-        public async Task<IdentityResult> DeleteUser(string email)
+        public async Task<IdentityResult> DeleteUser(string id)
         {
-            var user = await _userManager.FindByEmailAsync(email);
+            var user = await _userManager.FindByIdAsync(id);
             try
             {
                 if ((await _userManager.GetRolesAsync(user)).First().ToLower() == "admin")

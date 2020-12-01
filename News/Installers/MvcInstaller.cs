@@ -81,7 +81,12 @@ namespace News.Installers
             services.AddCors(c =>  
             {  
                 c.AddPolicy("AllowOrigin", options => options.AllowAnyOrigin());  
-            });  
+            });
+
+            services.AddControllersWithViews()
+                .AddNewtonsoftJson(options =>
+                options.SerializerSettings.ReferenceLoopHandling = Newtonsoft.Json.ReferenceLoopHandling.Ignore
+);
         }
     }
 }
