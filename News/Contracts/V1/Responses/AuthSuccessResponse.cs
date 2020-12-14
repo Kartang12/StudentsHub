@@ -8,8 +8,7 @@ namespace News.Contracts.V1.Responses
         public string Id { get; set; }
         public string Email { get; set; }
         public string Name { get; set; }
-        public string Group { get; set; }
-        public List<string> Roles { get; set; }
-        public List<Subject> subjects { get; set; }
+        public int Form { get; set; }
+        public string Role { get; set; }
     }
 }

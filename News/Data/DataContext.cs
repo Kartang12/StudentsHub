@@ -5,27 +5,26 @@ using News.Domain;
 
 namespace News.Data
 {
-    public class DataContext : IdentityDbContext<User, IdentityRole, string>
+    public class DataContext : IdentityDbContext<MyUser, IdentityRole, string>
     {
         public DataContext(DbContextOptions<DataContext> options) : base(options)
         {
         }
         
-        public DbSet<Group> Groups{ get; set; }
+        public DbSet<Form> Forms{ get; set; }
         
         public DbSet<Subject> Subjects{ get; set; }
 
-        public DbSet<Excersise> Excersises{ get; set; }
+        public DbSet<Exercise> Exersises{ get; set; }
 
-        public DbSet<StudentExcersise> StudentExcersises { get; set; }
+        public DbSet<StudentExercise> StudentExercises { get; set; }
 
 
         protected override void OnModelCreating(ModelBuilder builder)
         {
             base.OnModelCreating(builder);
-            builder.Entity<StudentExcersise>().HasKey(x => new { x.userId, x.taskId});
-            builder.Entity<Subject>().HasKey(x => new { x.Id});
-            //builder.Entity<Tag>().HasKey(x => new {x.TagId, x.TagName});
+            builder.Entity<StudentExercise>().HasKey(x => new { x.userId, x.exId });
+            //builder.Entity<Subject>().HasKey(x => new { x.Id});
             //builder.Entity<UserBusiness>().HasNoKey();
         }
     }

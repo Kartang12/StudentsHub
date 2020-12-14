@@ -1,4 +1,3 @@
-using News.Domain;
 using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
 
@@ -15,8 +14,8 @@ namespace News.Contracts.V1.Requests
 
         public string Role { get; set; }
 
-        public string Group { get; set; }
+        public string FormId { get; set; }
 
-        public virtual List<string> subjects { get; set; }
+        public virtual List<string> SubjectIds { get; set; }
     }
 }

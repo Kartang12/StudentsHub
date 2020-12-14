@@ -15,13 +15,13 @@ namespace News.Installers
             services.AddDbContext<DataContext>(options =>
                 options.UseSqlServer(
                     configuration.GetConnectionString("Connection2")));
-            services.AddDefaultIdentity<User>()
+            services.AddDefaultIdentity<MyUser>()
                 .AddRoles<IdentityRole>()
                 .AddEntityFrameworkStores<DataContext>();
 
             services.AddScoped<IIdentityService, IdentityService>();
-            services.AddScoped<IGroupService, GroupService>();
-            services.AddScoped<IExcersiseService, ExcersiseService>();
+            services.AddScoped<IFormService, FormService>();
+            services.AddScoped<IExerciseService, ExerciseService>();
             services.AddScoped<ISubjectService, SubjectService>();
         }
     }

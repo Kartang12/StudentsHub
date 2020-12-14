@@ -11,13 +11,13 @@ namespace News.Services
 {
     public interface IIdentityService
     {
-        Task<AuthSuccessResponse> RegisterAsync(string email, string name, string password, string role, string group, List<string> subjects);
+        Task<AuthSuccessResponse> RegisterAsync(string email, string name, string password, string role, string formId, List<string> subjects);
 
         Task<AuthSuccessResponse> LoginAsync(string email, string password);
 
-        Task<User> GetUsersByName(string name);
+        Task<MyUser> GetUsersByName(string name);
 
-        Task<User> GetUserByEmail(string name);
+        Task<MyUser> GetUserByEmail(string name);
 
         Task<IdentityResult> DeleteUser(string id);
     }

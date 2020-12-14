@@ -17,46 +17,50 @@
         {
             public const string Login = Base + "/identity/login";
             public const string Register = Base + "/identity/register";
-            public const string Refresh = Base + "/identity/refresh";
         }
 
         public static class Users
         {
             public const string GetAll = Base + "/users";
-            public const string Get = Base + "/user/{email}";
-            public const string Add = Base + "/users";
+            public const string Get = Base + "/user/{id}";
+            public const string Add = Base + "/user";
             public const string Delete = Base + "/user/{id}";
-            public const string Update = Base + "/user/{email}";
-            public const string Change = Base + "/userData/{email}";
+            public const string Update = Base + "/user/{id}";
+            //public const string Change = Base + "/userData/{id}";
         }
 
-        public static class Groups
+        public static class Forms
         {
-            public const string GetAll = Base + "/groups";
-            public const string Get = Base + "/groups/{groupName}";
-            public const string Create = Base + "/groups";
-            public const string Delete = Base + "/groups/{groupName}";
+            public const string GetAll = Base + "/forms";
+            public const string Get = Base + "/form/{id}";
+            public const string Create = Base + "/form";
+            public const string Update = Base + "/form";
+            public const string Delete = Base + "/form/{id}";
         }
 
         public static class Subjects
         {
             public const string GetAll = Base + "/subjects";
-            public const string Get = Base + "/subjects/{subName}";
-            public const string GetByUser = Base + "/subjectsByUserId/{userId}";
-            public const string Create = Base + "/subjects";
-            public const string Delete = Base + "/subjects/{subName}";
-            public const string Update = Base + "/subjects/{subName}";
+            public const string Get = Base + "/subject/{id}";
+            public const string Create = Base + "/subject";
+            public const string Update = Base + "/subject";
+            public const string Delete = Base + "/subject/{id}";
+
+            public const string ForTeatchers = Base + "/subjectsForTeatcher/{id}";
+            public const string ForStudent = Base + "/subjectsForStudent/{id}";
         }
 
         public static class Excersises
         {
-            public const string GetAll = Base + "/excersises";
-            public const string Save = Base + "/excersises/save";
-            public const string GetById = Base + "/excersise/{id}";
-            public const string Get = Base + "/excersises/{subjectName}";
-            public const string Create = Base + "/excersises";
-            public const string Delete = Base + "/excersises/{id}";
-            public const string Update = Base + "/excersises/{id}";
+            public const string GetAll = Base + "/exercises";
+            public const string Get = Base + "/exercise/{id}";
+            public const string Save = Base + "/exercise/save";
+            public const string GetBySubject = Base + "/exercises/{subjectId}";
+
+            public const string Create = Base + "/exercise";
+            public const string Update = Base + "/exercise";
+            public const string Delete = Base + "/exercise/{id}";
+
             public const string GetMarks = Base + "/marks/{id}";
 
         }

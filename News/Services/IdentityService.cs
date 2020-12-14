@@ -12,11 +12,11 @@ namespace News.Services
     public class IdentityService : IIdentityService
     {
         private readonly RoleManager<IdentityRole> _roleManager;
-        private readonly UserManager<User> _userManager;
+        private readonly UserManager<MyUser> _userManager;
         private readonly DataContext _context;
-        private readonly IGroupService _groupService;
+        private readonly IFormService _groupService;
 
-        public IdentityService(UserManager<User> userManager, DataContext context, RoleManager<IdentityRole> roleManager, IGroupService groupService)
+        public IdentityService(UserManager<MyUser> userManager, DataContext context, RoleManager<IdentityRole> roleManager, IFormService groupService)
         {
             _userManager = userManager;
             _roleManager = roleManager;
@@ -24,7 +24,7 @@ namespace News.Services
             _groupService = groupService;
         }
 
-        public async Task<AuthSuccessResponse> RegisterAsync(string email, string name, string password, string role, string group, List<string> subjects)
+        public async Task<AuthSuccessResponse> RegisterAsync(string email, string name, string password, string role, string formId, List<string> subjectIds)
         {
             var existingUser = await _userManager.FindByEmailAsync(email);
 
@@ -38,7 +38,7 @@ namespace News.Services
             }
 
             var newUserId = Guid.NewGuid();
-            var newUser = new User
+            var newUser = new MyUser
             {
                 Id = newUserId.ToString(),
                 Email = email,
@@ -56,14 +56,18 @@ namespace News.Services
                 };
 
             newUser = await _userManager.FindByEmailAsync(email);
-            newUser.subjects = new List<Subject>();
-            foreach(string sub in subjects)
-            {
-                newUser.subjects.Add(_context.Subjects.FirstOrDefault(x => x.Name == sub));
+            
+            if(subjectIds != null) 
+            { 
+                newUser.subjects = new List<Subject>();
+                foreach(string sub in subjectIds)
+                {
+                    newUser.subjects.Add(_context.Subjects.FirstOrDefault(x => x.Id.ToString() == sub));
+                }
             }
             
-            if (group != null)
-                newUser.group = await _groupService.GetGroupAsync(group);
+            if (formId != null)
+                newUser.form = await _groupService.GetFormAsync(formId);
 
             if (!createdUser.Succeeded)
             {
@@ -82,7 +86,6 @@ namespace News.Services
                 Id = newUser.Id,
                 Email = newUser.Email,
                 Name = newUser.UserName,
-                Group = group,
                 Success = true
             };
         }
@@ -118,20 +121,19 @@ namespace News.Services
                 Id = user.Id,
                 Email = user.Email,
                 Name = user.UserName ??= null,
-                Group = (user.group != null) ? user.group.Name : null,
-                subjects = (user.subjects != null) ? user.subjects : null,
-                Roles = (userRoles != null) ? userRoles.ToList() : null,
+                Form = (user.form!= null) ? user.form.Number: 0,
+                Role = (userRoles != null) ? userRoles.ToList()[0] : null,
                 Success = true
         };
         }
 
-        public async Task<User> GetUsersByName(string name)
+        public async Task<MyUser> GetUsersByName(string name)
         {
             return await _userManager.FindByNameAsync(name);
         }
-        public async Task<User> GetUserByEmail(string name)
+        public async Task<MyUser> GetUserByEmail(string email)
         {
-            return await _userManager.FindByEmailAsync(name);
+            return await _userManager.FindByEmailAsync(email);
         }
 
         //private ClaimsPrincipal GetPrincipalFromToken(string token)
@@ -285,8 +287,7 @@ namespace News.Services
         public async Task<IdentityResult> DeleteUser(string id)
         {
             var user = await _userManager.FindByIdAsync(id);
-            try
-            {
+
                 if ((await _userManager.GetRolesAsync(user)).First().ToLower() == "admin")
                 {
                     if ((await _userManager.GetUsersInRoleAsync("Admin")).Count <= 1)
@@ -304,8 +305,7 @@ namespace News.Services
                         // return result;
                     }
                 }
-            }
-            catch (Exception ex) { }
+
 
             return await _userManager.DeleteAsync(user);
         }

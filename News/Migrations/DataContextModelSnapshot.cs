@@ -154,11 +154,11 @@ namespace News.Migrations
                     b.ToTable("AspNetUserTokens");
                 });
 
-            modelBuilder.Entity("News.Domain.Excersise", b =>
+            modelBuilder.Entity("News.Domain.Exercise", b =>
                 {
-                    b.Property<Guid>("Id")
+                    b.Property<string>("exId")
                         .ValueGeneratedOnAdd()
-                        .HasColumnType("uniqueidentifier");
+                        .HasColumnType("nvarchar(450)");
 
                     b.Property<string>("content")
                         .HasColumnType("nvarchar(max)");
@@ -172,61 +172,28 @@ namespace News.Migrations
                     b.Property<string>("title")
                         .HasColumnType("nvarchar(max)");
 
-                    b.HasKey("Id");
+                    b.HasKey("exId");
 
                     b.HasIndex("subjectId");
 
-                    b.ToTable("Excersises");
+                    b.ToTable("Exersises");
                 });
 
-            modelBuilder.Entity("News.Domain.Group", b =>
+            modelBuilder.Entity("News.Domain.Form", b =>
                 {
                     b.Property<Guid>("Id")
                         .ValueGeneratedOnAdd()
                         .HasColumnType("uniqueidentifier");
 
-                    b.Property<string>("Name")
-                        .HasColumnType("nvarchar(max)");
-
-                    b.HasKey("Id");
-
-                    b.ToTable("Groups");
-                });
-
-            modelBuilder.Entity("News.Domain.StudentExcersise", b =>
-                {
-                    b.Property<string>("userId")
-                        .HasColumnType("nvarchar(450)");
-
-                    b.Property<string>("taskId")
-                        .HasColumnType("nvarchar(450)");
-
-                    b.Property<string>("answer")
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<int>("mark")
+                    b.Property<int>("Number")
                         .HasColumnType("int");
 
-                    b.HasKey("userId", "taskId");
-
-                    b.ToTable("StudentExcersises");
-                });
-
-            modelBuilder.Entity("News.Domain.Subject", b =>
-                {
-                    b.Property<Guid>("Id")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("uniqueidentifier");
-
-                    b.Property<string>("Name")
-                        .HasColumnType("nvarchar(max)");
-
                     b.HasKey("Id");
 
-                    b.ToTable("Subjects");
+                    b.ToTable("Forms");
                 });
 
-            modelBuilder.Entity("News.Domain.User", b =>
+            modelBuilder.Entity("News.Domain.MyUser", b =>
                 {
                     b.Property<string>("Id")
                         .HasColumnType("nvarchar(450)");
@@ -278,7 +245,7 @@ namespace News.Migrations
                         .HasMaxLength(256)
                         .HasColumnType("nvarchar(256)");
 
-                    b.Property<Guid?>("groupId")
+                    b.Property<Guid?>("formId")
                         .HasColumnType("uniqueidentifier");
 
                     b.HasKey("Id");
@@ -291,24 +258,52 @@ namespace News.Migrations
                         .HasDatabaseName("UserNameIndex")
                         .HasFilter("[NormalizedUserName] IS NOT NULL");
 
-                    b.HasIndex("groupId");
+                    b.HasIndex("formId");
 
                     b.ToTable("AspNetUsers");
                 });
 
-            modelBuilder.Entity("SubjectUser", b =>
+            modelBuilder.Entity("News.Domain.StudentExercise", b =>
                 {
-                    b.Property<Guid>("subjectsId")
-                        .HasColumnType("uniqueidentifier");
-
-                    b.Property<string>("usersId")
+                    b.Property<string>("userId")
                         .HasColumnType("nvarchar(450)");
 
-                    b.HasKey("subjectsId", "usersId");
+                    b.Property<string>("exId")
+                        .HasColumnType("nvarchar(450)");
 
-                    b.HasIndex("usersId");
+                    b.Property<string>("answer")
+                        .HasColumnType("nvarchar(max)");
 
-                    b.ToTable("SubjectUser");
+                    b.Property<bool>("mark")
+                        .HasColumnType("bit");
+
+                    b.HasKey("userId", "exId");
+
+                    b.ToTable("StudentExercises");
+                });
+
+            modelBuilder.Entity("News.Domain.Subject", b =>
+                {
+                    b.Property<Guid>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("uniqueidentifier");
+
+                    b.Property<string>("MyUserId")
+                        .HasColumnType("nvarchar(450)");
+
+                    b.Property<string>("Name")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<Guid?>("formId")
+                        .HasColumnType("uniqueidentifier");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("MyUserId");
+
+                    b.HasIndex("formId");
+
+                    b.ToTable("Subjects");
                 });
 
             modelBuilder.Entity("Microsoft.AspNetCore.Identity.IdentityRoleClaim<string>", b =>
@@ -322,7 +317,7 @@ namespace News.Migrations
 
             modelBuilder.Entity("Microsoft.AspNetCore.Identity.IdentityUserClaim<string>", b =>
                 {
-                    b.HasOne("News.Domain.User", null)
+                    b.HasOne("News.Domain.MyUser", null)
                         .WithMany()
                         .HasForeignKey("UserId")
                         .OnDelete(DeleteBehavior.Cascade)
@@ -331,7 +326,7 @@ namespace News.Migrations
 
             modelBuilder.Entity("Microsoft.AspNetCore.Identity.IdentityUserLogin<string>", b =>
                 {
-                    b.HasOne("News.Domain.User", null)
+                    b.HasOne("News.Domain.MyUser", null)
                         .WithMany()
                         .HasForeignKey("UserId")
                         .OnDelete(DeleteBehavior.Cascade)
@@ -346,7 +341,7 @@ namespace News.Migrations
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
-                    b.HasOne("News.Domain.User", null)
+                    b.HasOne("News.Domain.MyUser", null)
                         .WithMany()
                         .HasForeignKey("UserId")
                         .OnDelete(DeleteBehavior.Cascade)
@@ -355,44 +350,57 @@ namespace News.Migrations
 
             modelBuilder.Entity("Microsoft.AspNetCore.Identity.IdentityUserToken<string>", b =>
                 {
-                    b.HasOne("News.Domain.User", null)
+                    b.HasOne("News.Domain.MyUser", null)
                         .WithMany()
                         .HasForeignKey("UserId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
                 });
 
-            modelBuilder.Entity("News.Domain.Excersise", b =>
+            modelBuilder.Entity("News.Domain.Exercise", b =>
                 {
                     b.HasOne("News.Domain.Subject", "subject")
-                        .WithMany()
+                        .WithMany("exercises")
                         .HasForeignKey("subjectId");
 
                     b.Navigation("subject");
                 });
 
-            modelBuilder.Entity("News.Domain.User", b =>
+            modelBuilder.Entity("News.Domain.MyUser", b =>
                 {
-                    b.HasOne("News.Domain.Group", "group")
-                        .WithMany()
-                        .HasForeignKey("groupId");
+                    b.HasOne("News.Domain.Form", "form")
+                        .WithMany("Students")
+                        .HasForeignKey("formId");
 
-                    b.Navigation("group");
+                    b.Navigation("form");
                 });
 
-            modelBuilder.Entity("SubjectUser", b =>
+            modelBuilder.Entity("News.Domain.Subject", b =>
                 {
-                    b.HasOne("News.Domain.Subject", null)
-                        .WithMany()
-                        .HasForeignKey("subjectsId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
+                    b.HasOne("News.Domain.MyUser", null)
+                        .WithMany("subjects")
+                        .HasForeignKey("MyUserId");
 
-                    b.HasOne("News.Domain.User", null)
+                    b.HasOne("News.Domain.Form", "form")
                         .WithMany()
-                        .HasForeignKey("usersId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
+                        .HasForeignKey("formId");
+
+                    b.Navigation("form");
+                });
+
+            modelBuilder.Entity("News.Domain.Form", b =>
+                {
+                    b.Navigation("Students");
+                });
+
+            modelBuilder.Entity("News.Domain.MyUser", b =>
+                {
+                    b.Navigation("subjects");
+                });
+
+            modelBuilder.Entity("News.Domain.Subject", b =>
+                {
+                    b.Navigation("exercises");
                 });
 #pragma warning restore 612, 618
         }

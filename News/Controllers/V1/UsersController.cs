@@ -16,9 +16,9 @@ namespace News.Controllers.V1
     public class UsersController : Controller
     {
         private readonly IIdentityService _identityService;
-        private readonly UserManager<User> _userManager;
+        private readonly UserManager<MyUser> _userManager;
 
-        public UsersController(UserManager<User> userManager, IIdentityService identityService)
+        public UsersController(UserManager<MyUser> userManager, IIdentityService identityService)
         {
             _userManager = userManager;
             _identityService = identityService;
@@ -29,16 +29,11 @@ namespace News.Controllers.V1
         {
             var rawUsers = _userManager.Users;
             List<UserDataResponse> response = new List<UserDataResponse>();
-            foreach (User user in rawUsers)
+            foreach (MyUser user in rawUsers)
             {
                 string role = null;
-                try
-                {
-                    role = (await _userManager.GetRolesAsync(user)).First();
-                }
-                catch (Exception ex)
-                {
-                }
+                role = (await _userManager.GetRolesAsync(user)).First();
+
                 response.Add(new UserDataResponse()
                 {
                     Id = user.Id,
@@ -54,13 +49,8 @@ namespace News.Controllers.V1
         {
             var user = await _identityService.GetUserByEmail(email);
             string role = null;
-            try
-            {
-                role = (await _userManager.GetRolesAsync(user)).First();
-            }
-            catch (Exception ex)
-            {
-            }
+            role = (await _userManager.GetRolesAsync(user)).First();
+
 
             return Ok(new UserDataResponse()
             {

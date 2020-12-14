@@ -25,7 +25,7 @@ namespace News
                 await dbContext.Database.MigrateAsync();
 
                 var roleManager = serviceScope.ServiceProvider.GetRequiredService<RoleManager<IdentityRole>>();
-                var userManager = serviceScope.ServiceProvider.GetRequiredService<UserManager<User>>();
+                var userManager = serviceScope.ServiceProvider.GetRequiredService<UserManager<MyUser>>();
 
                 if (!await roleManager.RoleExistsAsync("Admin"))
                 {
@@ -48,14 +48,28 @@ namespace News
                 if (adminExists.Count <= 0)
                 {
                     var newUserId = Guid.NewGuid();
-                    var newUser = new User
+                    var newUser = new MyUser
                     {
                         Id = newUserId.ToString(),
-                        Email = "-",
+                        Email = "admin@example.com",
                         UserName = "admin"
                     };
                     await userManager.CreateAsync(newUser, "String1234.");
                     await userManager.AddToRoleAsync(newUser, "Admin");
+                }
+                
+                var teatcherExists = await userManager.GetUsersInRoleAsync("Teatcher");
+                if (adminExists.Count <= 0)
+                {
+                    var newUserId = Guid.NewGuid();
+                    var newUser = new MyUser
+                    {
+                        Id = newUserId.ToString(),
+                        Email = "teatcher@example.com",
+                        UserName = "teatcher"
+                    };
+                    await userManager.CreateAsync(newUser, "String1234.");
+                    await userManager.AddToRoleAsync(newUser, "Teatcher");
                 }
             }
             await host.RunAsync();

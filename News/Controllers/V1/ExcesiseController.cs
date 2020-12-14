@@ -11,9 +11,9 @@ namespace News.Controllers.V1
 {
     public class ExcesiseController : Controller
     {
-        private readonly IExcersiseService _excersiseService;
+        private readonly IExerciseService _excersiseService;
 
-        public ExcesiseController(IExcersiseService es)
+        public ExcesiseController(IExerciseService es)
         {
             _excersiseService = es;
         }
@@ -24,16 +24,16 @@ namespace News.Controllers.V1
             return Ok(await _excersiseService.GetAll());
         }
         
-        [HttpGet(ApiRoutes.Excersises.GetById)]
-        public async Task<IActionResult> GetAll([FromRoute] string id)
+        [HttpGet(ApiRoutes.Excersises.Get)]
+        public async Task<IActionResult> Get([FromRoute] string id)
         {
-            return Ok(await _excersiseService.GetExcerseByIdAsync(id));
+            return Ok(await _excersiseService.GetExerciseByIdAsync(id));
         }
 
-        [HttpGet(ApiRoutes.Excersises.Get)]
-        public async Task<IActionResult> GetBySubject([FromRoute] string subjectName)
+        [HttpGet(ApiRoutes.Excersises.GetBySubject)]
+        public async Task<IActionResult> GetBySubject([FromRoute] string subjectId)
         {
-            var ex = await _excersiseService.GetExcersesBySubjectAsync(subjectName);
+            var ex = await _excersiseService.GetExercisesBySubjectAsync(subjectId);
 
             if (ex == null)
             {
@@ -44,7 +44,7 @@ namespace News.Controllers.V1
         }
 
         [HttpPost(ApiRoutes.Excersises.Save)]
-        public async Task<IActionResult> SaveExcersiseAsync([FromBody] ExcersiseAnswerRequest request)
+        public async Task<IActionResult> SaveExcersiseAsync([FromBody] ExerciseAnswerRequest request)
         {
             var ex = await _excersiseService.SaveExcersiseAsync(request.userId, request.taskId, request.answer);
 
@@ -57,9 +57,9 @@ namespace News.Controllers.V1
         }
 
         [HttpPost(ApiRoutes.Excersises.Create)]
-        public async Task<IActionResult> Create([FromBody] CreateExcersiseRequest request)
+        public async Task<IActionResult> Create([FromBody] CreateEcerciseRequest request)
         {
-            var created = await _excersiseService.CreateExcersiseAsync(request.Title, request.Content, request.CorrectAnswer, request.SubjectName);
+            var created = await _excersiseService.CreateExcersiseAsync(request.Title, request.Content, request.CorrectAnswer, request.SubjectId);
             if (!created)
             {
                 return BadRequest(new { error = "Unable to create excersise" });
@@ -80,9 +80,9 @@ namespace News.Controllers.V1
         }
 
         [HttpPut(ApiRoutes.Excersises.Update)]
-        public async Task<IActionResult> Update([FromRoute] string id, [FromBody] ExersiseUpdateRequest ex)
+        public async Task<IActionResult> Update([FromBody] ExerciseUpdateRequest ex)
         {
-            var updated = await _excersiseService.UpdateExcersiseAsync(id, ex.title, ex.content, ex.correctAnswer);
+            var updated = await _excersiseService.UpdateExcersiseAsync(ex.Id, ex.Title, ex.Content, ex.CorrectAnswer);
 
             if (updated)
                 return Ok();
