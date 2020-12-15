@@ -87,7 +87,6 @@ namespace News.Services
         public async Task<StudentExercise> CheckTask(string exId, string uId)
         {
             var a = await _dataContext.StudentExercises.AsNoTracking().FirstAsync(x => x.userId == uId && x.exId == exId);
-
             return a;
         }
 

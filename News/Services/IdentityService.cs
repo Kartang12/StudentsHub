@@ -48,7 +48,7 @@ namespace News.Services
             var createdUser = await _userManager.CreateAsync(newUser, password);
             await _context.SaveChangesAsync();
 
-            if (!_roleManager.Roles.Select(x => x.Name.ToLower() == role.ToLower()).Any())
+            if (_roleManager.Roles.First(x => x.Name == role) == null)
                 return new AuthSuccessResponse
                 {
                     Success = false,
@@ -57,7 +57,7 @@ namespace News.Services
 
             newUser = await _userManager.FindByEmailAsync(email);
             
-            if(subjectIds != null) 
+            if(subjectIds.Count >  0) 
             { 
                 newUser.subjects = new List<Subject>();
                 foreach(string sub in subjectIds)

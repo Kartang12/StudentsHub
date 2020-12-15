@@ -47,7 +47,7 @@ namespace News.Services
         public async Task<bool> UpdateSubjectAsync(string id, string subjectName, string formId)
         {
             var a = _dataContext.Subjects.Where(x => x.Id.ToString() == id);
-            if (a.Count() > 0)
+            if (a.Count() < 0)
                 return false;
 
             var subject = _dataContext.Subjects.First(x => x.Id.ToString() == id);

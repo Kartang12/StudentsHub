@@ -58,19 +58,6 @@ namespace News
                     await userManager.AddToRoleAsync(newUser, "Admin");
                 }
                 
-                var teatcherExists = await userManager.GetUsersInRoleAsync("Teatcher");
-                if (adminExists.Count <= 0)
-                {
-                    var newUserId = Guid.NewGuid();
-                    var newUser = new MyUser
-                    {
-                        Id = newUserId.ToString(),
-                        Email = "teatcher@example.com",
-                        UserName = "teatcher"
-                    };
-                    await userManager.CreateAsync(newUser, "String1234.");
-                    await userManager.AddToRoleAsync(newUser, "Teatcher");
-                }
             }
             await host.RunAsync();
         }
