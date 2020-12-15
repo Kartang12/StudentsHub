@@ -100,5 +100,12 @@ namespace News.Controllers.V1
 
             return NotFound();
         }
+
+        [HttpPost(ApiRoutes.Excersises.CHeckExercise)]
+        public async Task<IActionResult> CHeckExercise([FromBody] CheckExercise request)
+        {
+            var ex = await _excersiseService.CheckTask(request.exId, request.uId);
+            return Ok(ex);
+        }
     }
 }

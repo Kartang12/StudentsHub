@@ -62,6 +62,8 @@
             public const string Delete = Base + "/exercise/{id}";
 
             public const string GetMarks = Base + "/marks/{id}";
+            public const string CHeckExercise = Base + "/checkExercise";
+
 
         }
     }

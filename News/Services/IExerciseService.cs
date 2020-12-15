@@ -18,6 +18,8 @@ namespace News.Services
 
         Task<bool> SaveExcersiseAsync(string userId, string taskId, string answer);
 
+        Task<StudentExercise> CheckTask(string exId, string uId);
+
         Task<StudentExercise[]> GetMarksAsync(string userId);
     }
 }

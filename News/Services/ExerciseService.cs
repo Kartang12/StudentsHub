@@ -84,6 +84,13 @@ namespace News.Services
             return await Task.FromResult(stEx);
         }
 
+        public async Task<StudentExercise> CheckTask(string exId, string uId)
+        {
+            var a = await _dataContext.StudentExercises.AsNoTracking().FirstAsync(x => x.userId == uId && x.exId == exId);
+
+            return a;
+        }
+
         public async Task<bool> UpdateExcersiseAsync(string excesiseId, string title, string content, string correctAnswer)
         {
             var ex = await _dataContext.Exersises.SingleOrDefaultAsync(x => x.exId == excesiseId);
